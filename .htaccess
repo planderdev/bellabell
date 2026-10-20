@@ -1,0 +1,11 @@
+Options -Indexes
+RewriteEngine On
+RewriteRule ^(?:includes|sections|data|design-system|docs|tests|tools|vendor|node_modules|\.git|\.runtime)(?:/|$) - [F,L]
+RewriteRule (^|/)\. - [F,L]
+RewriteCond %{REQUEST_URI} !^/assets/
+RewriteRule ^ router.php [L,QSA]
+<IfModule mod_headers.c>
+  <FilesMatch "\.(?:webp|avif|woff2|mp4)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>

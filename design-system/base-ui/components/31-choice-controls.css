@@ -1,0 +1,208 @@
+.checkbox {
+  display:inline-flex;
+  align-items:center;
+  min-height:44px;
+  cursor:pointer;
+}
+.radio,.switch {
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  min-height:44px;
+  cursor:pointer;
+  max-width:100%;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+.checkbox input {
+  appearance:none;
+  display:grid;
+  place-items:center;
+  margin:0;
+  cursor:pointer;
+  flex-shrink:0;
+}
+.radio input {
+  appearance:none;
+  display:grid;
+  place-items:center;
+  width:22px;
+  height:22px;
+  margin:0;
+  border:1.5px solid var(--line-normal-normal);
+  background:var(--surface);
+  cursor:pointer;
+  flex-shrink:0;
+  border-radius:50%;
+}
+.checkbox input:checked {
+  border-color:var(--brand);
+}
+.checkbox input:indeterminate,.radio input:checked {
+  background:var(--brand);
+  border-color:var(--brand);
+}
+.checkbox input:checked::after {
+  content:"";
+  border:solid var(--brand-on);
+  border-width:0 2px 2px 0;
+  transform:rotate(45deg) translateY(-1px);
+}
+.checkbox input:indeterminate::after {
+  content:"";
+}
+.radio input:checked::after {
+  content:"";
+  width:8px;
+  height:8px;
+  background:var(--brand-on);
+  border-radius:50%;
+}
+.checkbox input:disabled {
+  cursor:not-allowed;
+}
+.radio input:disabled {
+  opacity:.35;
+  cursor:not-allowed;
+}
+.checkmark input {
+  border:0;
+  background:var(--fill-normal);
+  border-radius:50%;
+}
+.switch input {
+  appearance:none;
+  width:48px;
+  height:28px;
+  position:relative;
+  border:0;
+  border-radius:40px;
+  background:var(--fill-strong);
+  margin:0;
+  cursor:pointer;
+  transition:background .2s;
+  flex-shrink:0;
+}
+.switch input::after {
+  content:"";
+  position:absolute;
+  top:3px;
+  left:3px;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:white;
+  box-shadow:0 1px 4px #0002;
+  transition:transform .2s;
+}
+.switch input:checked {
+  background:var(--brand);
+}
+.switch input:checked::after {
+  transform:translateX(20px);
+}
+.switch input:disabled {
+  opacity:.35;
+}
+.agreement {
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:var(--responsive-space-20);
+}
+.agreement__all {
+  font-weight:600;
+  font-size:18px;
+  width:100%;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:12px;
+}
+.agreement__item {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.checkbox {
+  --check-size:24px;
+  gap:10px;
+  max-width:100%;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+.checkbox input {
+  width:var(--check-size);
+  height:var(--check-size);
+  border:0;
+  border-radius:50%;
+  background:var(--grey-200);
+  position:relative;
+}
+.checkbox input::after {
+  content:"";
+  width:calc(var(--check-size)*.24);
+  height:calc(var(--check-size)*.43);
+  border:solid var(--surface);
+  border-width:0 2px 2px 0;
+  transform:rotate(45deg) translate(-1px,-1px);
+}
+.checkbox input:checked {
+  background:var(--brand);
+}
+.checkbox input:checked::after {
+  width:calc(var(--check-size)*.24);
+  height:calc(var(--check-size)*.43);
+  border-color:var(--brand-on);
+}
+.checkbox input:indeterminate::after {
+  width:calc(var(--check-size)*.45);
+  height:2px;
+  transform:none;
+  border:0;
+  background:var(--brand-on);
+}
+.checkbox--line input {
+  background:transparent;
+}
+.checkbox--line input::after {
+  border-color:var(--grey-300);
+}
+.checkbox--line input:checked {
+  background:transparent;
+}
+.checkbox--line input:checked::after {
+  border-color:var(--brand);
+}
+.checkbox--line input:indeterminate {
+  background:transparent;
+}
+.checkbox--line input:indeterminate::after {
+  background:var(--brand);
+}
+.checkbox:has(input:disabled) {
+  color:var(--grey-400);
+  cursor:default;
+}
+.checkbox input:disabled {
+  opacity:.4;
+}
+.checkbox--small {
+  --check-size:20px;
+}
+.checkbox--large {
+  --check-size:32px;
+}
+.framed {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:16px;
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  gap:12px;
+}
+.framed:has(input:checked) {
+  border-color:var(--brand);
+  background:var(--brand-soft);
+}

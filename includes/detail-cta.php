@@ -1,0 +1,1 @@
+<section class="detail-cta container"><div><p><?= e(t('global.label')) ?></p><h2><?= lines('global.title') ?></h2></div><a class="button" href="<?= e(url('contact')) ?>"><?= e(t('global.cta')) ?><span class="button-icon"><?= icon('arrow-up-right') ?></span></a></section>

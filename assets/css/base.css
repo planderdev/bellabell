@@ -1,0 +1,31 @@
+/* Site semantics and typography. Component appearance belongs to ui.css. */
+html{color-scheme:light;scroll-padding-top:96px}
+body.menu-open{overflow:hidden}
+a{text-decoration:none}
+button{color:inherit;border:0;background:transparent}
+a,button,summary{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+figure,ul{margin:0;padding:0}ul{list-style:none}
+img,video{display:block;width:100%;height:100%;object-fit:cover}
+svg{display:block;width:24px;height:24px;stroke-width:2;flex-shrink:0}
+::selection{background:var(--brand);color:var(--brand-on)}
+h1,h2,h3{font-weight:var(--font-weight-bold);text-wrap:balance}
+h1,.display-title{font-size:var(--responsive-font-size-display-1);line-height:var(--responsive-line-height-display-1);letter-spacing:var(--letter-spacing-display-1)}
+h2{font-size:var(--responsive-font-size-display-2);line-height:var(--responsive-line-height-display-2);letter-spacing:var(--letter-spacing-display-2)}
+h3{font-size:var(--responsive-font-size-title-3);line-height:var(--responsive-line-height-title-3);letter-spacing:var(--letter-spacing-title-3)}
+p{word-break:keep-all;overflow-wrap:break-word}
+html[lang="zh-CN"] p{word-break:normal}
+.container{width:100%;max-width:var(--container);padding-inline:var(--responsive-space-24);margin-inline:auto}
+.section-pad{padding-block:var(--responsive-space-80)}
+.body-copy{font-size:var(--font-size-body-1-reading);line-height:var(--line-height-body-1-reading);letter-spacing:var(--letter-spacing-body-1-reading);color:var(--muted);max-width:560px}
+.eyebrow,.section-label{font-size:var(--font-size-label-1);line-height:var(--line-height-label-1);letter-spacing:var(--letter-spacing-label-1);font-weight:var(--font-weight-semibold);margin-bottom:var(--responsive-space-24)}
+.section-label{color:var(--brand-ink)}
+.text-link{display:inline-flex;align-items:center;gap:var(--space-8);min-height:var(--touch-target);padding-block:var(--space-8);font-size:var(--font-size-body-1);line-height:var(--line-height-body-1);font-weight:var(--font-weight-semibold);color:var(--brand-ink);max-width:100%;overflow-wrap:anywhere;transition:color var(--duration-fast)}
+.text-link svg{width:20px;height:20px;transition:transform var(--duration-normal) var(--ease-standard)}
+.text-link:hover svg{transform:translate(2px,-2px)}
+.text-link:hover{text-decoration:underline;text-underline-offset:4px}
+.skip-link{position:fixed;top:var(--space-8);left:var(--space-8);padding:var(--space-16) var(--space-24);border-radius:var(--radius-md);background:var(--surface);color:var(--text);z-index:var(--z-toast);transform:translateY(-200%)}
+.skip-link:focus{transform:none}
+.button-icon{display:inline-flex}
+.button-icon svg{width:24px;height:24px}
+main{display:block}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}

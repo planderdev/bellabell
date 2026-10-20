@@ -1,0 +1,33 @@
+.accordion {
+  border-bottom:1px solid var(--border);
+}
+.accordion summary {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:20px 0;
+  cursor:pointer;
+  list-style:none;
+  font-weight:600;
+  gap:16px;
+  overflow-wrap:anywhere;
+}
+.accordion summary::-webkit-details-marker {
+  display:none;
+}
+.accordion summary::after {
+  content:"+";
+  font-size:24px;
+  font-weight:400;
+}
+.accordion[open] summary::after {
+  content:"−";
+}
+.accordion__body {
+  padding:0 0 24px;
+  color:var(--muted);
+  overflow-wrap:anywhere;
+}
+.accordion summary::after {
+  flex:none;
+}

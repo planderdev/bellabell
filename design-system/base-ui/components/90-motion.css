@@ -1,0 +1,83 @@
+@keyframes button-loading {
+  0%,60%,100% {
+    transform:translateY(0);
+    opacity:.4;
+  }
+  30% {
+    transform:translateY(-3px);
+    opacity:1;
+  }
+}
+@keyframes spin {
+  to {
+    transform:rotate(360deg);
+  }
+}
+@keyframes pulse {
+  50% {
+    opacity:.35;
+    transform:scale(.7);
+  }
+}
+@keyframes shimmer {
+  to {
+    background-position:-200%0;
+  }
+}
+@keyframes enter {
+  from {
+    opacity:0;
+    transform:translateY(8px);
+  }
+  to {
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+@keyframes skeleton-pulse {
+  0%,100% {
+    opacity:1;
+  }
+  50% {
+    opacity:.45;
+  }
+}
+@keyframes sheet-enter {
+  from {
+    transform:translateY(100%);
+  }
+  to {
+    transform:translateY(0);
+  }
+}
+@keyframes cta-fade {
+  from {
+    opacity:0;
+  }
+  to {
+    opacity:1;
+  }
+}
+@keyframes cta-scale {
+  from {
+    transform:scale(.94);
+    opacity:0;
+  }
+  to {
+    transform:scale(1);
+    opacity:1;
+  }
+}
+@keyframes row-shine {
+  from {
+    transform:translateX(-100%);
+  }
+  to {
+    transform:translateX(100%);
+  }
+}
+@keyframes row-blink {
+  50% {
+    background:var(--brand-soft);
+  }
+}

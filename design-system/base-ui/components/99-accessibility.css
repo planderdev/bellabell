@@ -1,0 +1,25 @@
+@media (forced-colors:active) {
+  .button,.chip,.checkbox input,.radio input,.switch input {
+    border:1px solid ButtonText;
+  }
+  .checkbox input:checked,.radio input:checked,.switch input:checked {
+    background:Highlight;
+    forced-color-adjust:none;
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .root *,.root *::before,.root *::after {
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .tabs [role=tab],.tabs .tabs__indicator {
+    transition:none!important;
+  }
+  .tabs {
+    scroll-behavior:auto!important;
+  }
+}
