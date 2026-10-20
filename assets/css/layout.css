@@ -54,7 +54,6 @@
 .footer-signature img{height:auto;object-fit:contain}
 .history-section{display:grid;grid-template-columns:1fr 1fr;gap:var(--responsive-space-80)}
 .history-heading{align-self:start;position:sticky;top:112px;min-width:0}
-.history-year{font-size:var(--responsive-font-size-display-1);line-height:var(--responsive-line-height-display-1);letter-spacing:var(--letter-spacing-display-1);margin-top:var(--responsive-space-48);color:var(--brand-ink);font-weight:var(--font-weight-bold)}
 .history-event{position:relative;padding-block:var(--responsive-space-32);border-top:1px solid var(--border)}
 .history-event::before{content:"";position:absolute;left:0;top:-1px;width:100%;height:2px;background:var(--brand);transform:scaleX(var(--event-progress,0));transform-origin:left}
 .event-year{font-size:var(--font-size-label-1);color:var(--brand-ink);display:block;margin-bottom:var(--space-16);font-weight:var(--font-weight-semibold)}

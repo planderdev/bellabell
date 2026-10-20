@@ -3,6 +3,12 @@ export function initSliders(reduced) {
   if (!section || !window.Swiper || reduced) return () => {};
   const media = matchMedia('(max-width:1023px)');
   let swiper = null;
+  const destroySlider = () => {
+    if (swiper) swiper.destroy(true,true);
+    swiper=null;section.classList.remove('has-slider');
+    // Desktop GSAP uses aria-disabled; discard Swiper's native disabled state.
+    section.querySelectorAll('.brand-navigation button').forEach(button=>{button.disabled=false;});
+  };
   const update = () => {
     if (media.matches && !swiper) {
       section.classList.add('has-slider');
@@ -23,15 +29,14 @@ export function initSliders(reduced) {
         }
       });
     } else if (!media.matches && swiper) {
-      swiper.destroy(true,true);swiper=null;section.classList.remove('has-slider');
+      destroySlider();
       if (!section.classList.contains('is-pinned')) section.querySelectorAll('.brand-panel').forEach(panel=>{panel.inert=false;panel.removeAttribute('aria-hidden');});
     }
   };
   update();media.addEventListener('change',update);
   return ()=>{
     media.removeEventListener('change',update);
-    if (swiper) swiper.destroy(true,true);
-    section.classList.remove('has-slider');
+    destroySlider();
     section.querySelectorAll('.brand-panel').forEach(panel=>{panel.inert=false;panel.removeAttribute('aria-hidden');});
   };
 }
