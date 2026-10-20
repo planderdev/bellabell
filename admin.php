@@ -21,6 +21,10 @@ function admin_layout(string $title, string $body, int $status = 200): never {
     echo '</head><body class="root admin-body">' . $body . '</body></html>';
     exit;
 }
+function admin_time(?string $value): string {
+    if (!$value) return '';
+    try { return (new DateTime($value))->setTimezone(new DateTimeZone('Asia/Seoul'))->format('Y-m-d H:i'); } catch (\Throwable) { return substr($value, 0, 16); }
+}
 function admin_redirect(string $to): never { header('Location: ' . $to, true, 303); exit; }
 function admin_query(array $overrides = []): string {
     $params = array_filter(array_merge(['status' => $_GET['status'] ?? 'open', 'q' => $_GET['q'] ?? '', 'page' => $_GET['page'] ?? ''], $overrides), fn($v) => $v !== '' && $v !== null);
@@ -127,7 +131,7 @@ ob_start();
                     <span class="admin-badge admin-badge--type"><?= e($types[$row['type']] ?? $row['type']) ?></span>
                     <span class="admin-badge"><?= e($locales[$row['locale']] ?? $row['locale']) ?></span>
                     <?php if ($row['mail_sent']): ?><span class="admin-badge">메일 발송됨</span><?php endif; ?>
-                    <time datetime="<?= e($row['created_at']) ?>"><?= e(substr((string)$row['created_at'], 0, 16)) ?> UTC</time>
+                    <time datetime="<?= e($row['created_at']) ?>"><?= e(admin_time($row['created_at'])) ?> KST</time>
                 </div>
                 <form method="post" action="/admin/handle">
                     <input type="hidden" name="token" value="<?= e($formToken) ?>"><input type="hidden" name="id" value="<?= (int)$row['id'] ?>"><input type="hidden" name="done" value="<?= $handled ? '0' : '1' ?>"><input type="hidden" name="back" value="<?= e($back) ?>">
@@ -137,7 +141,7 @@ ob_start();
             <h2><?= e($row['name']) ?><?php if ($row['company'] !== ''): ?> <span class="admin-company">· <?= e($row['company']) ?></span><?php endif; ?></h2>
             <p class="admin-contact"><a class="text-link" href="mailto:<?= e($row['email']) ?>?subject=<?= rawurlencode('[BELLABELL FARM] 문의 답변') ?>"><?= e($row['email']) ?></a></p>
             <p class="admin-message"><?= nl2br(e($row['message']), false) ?></p>
-            <?php if ($handled): ?><p class="admin-handled">처리 완료 <?= e(substr((string)$row['handled_at'], 0, 16)) ?> UTC</p><?php endif; ?>
+            <?php if ($handled): ?><p class="admin-handled">처리 완료 <?= e(admin_time($row['handled_at'])) ?> KST</p><?php endif; ?>
         </li>
         <?php endforeach; ?>
     </ol>
