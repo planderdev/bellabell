@@ -52,7 +52,7 @@ check(valid_contact_token($post,104),'Valid token rejected');
 check(!valid_contact_token($post,101),'Fast bot submission accepted');
 check(!valid_contact_token($post,8000),'Expired token accepted');
 check(!valid_contact_token(['csrf'=>'wrong'],104),'Bad CSRF accepted');
-check(!valid_contact_token(['csrf'=>substr($token,0,103).'0'],104),'Tampered signature accepted');
+check(!valid_contact_token(['csrf'=>substr($token,0,103).(substr($token,-1)==='0'?'1':'0')],104),'Tampered signature accepted');
 check(!valid_contact_token(['csrf'=>'0000ffff'.substr($token,8)],104),'Tampered timestamp accepted');
 check(!valid_contact_token(['csrf'=>$token,'website'=>'bot'],104),'Honeypot accepted');
 check(!valid_contact_token(['csrf'=>[]],104),'Array CSRF accepted');

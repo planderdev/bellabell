@@ -5,3 +5,5 @@ node_modules/
 tools/composer.phar
 *.log
 .vercel
+.claude/
+.vercel/

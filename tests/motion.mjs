@@ -6,6 +6,7 @@ const {chapterAt,initPins}=await moduleFrom('../assets/js/pin-scroll.js');
 const {initAnimations}=await moduleFrom('../assets/js/animations.js');
 const {createSmoothScroll}=await moduleFrom('../assets/js/smooth-scroll.js');
 const {scrollTopFor}=await moduleFrom('../assets/js/scroll-target.js');
+const {initMobileMotion,MOBILE_QUERY}=await moduleFrom('../assets/js/mobile-motion.js');
 let assertions=0;
 const equal=(actual,expected)=>{assert.deepEqual(actual,expected);assertions++;};
 for(const boundaries of [[1.28,3.23],[1.1,2.8],[1.3]]){
@@ -20,6 +21,9 @@ for(const boundaries of [[1.28,3.23],[1.1,2.8],[1.3]]){
 equal(typeof initPins(true,()=>{throw Error('Unexpected scroll setup');}),'function');
 equal(typeof initAnimations(true),'function');
 equal(createSmoothScroll(true),null);
+equal(typeof initMobileMotion(true),'function');
+// Mobile layer is the complement of the desktop pin breakpoint.
+equal(MOBILE_QUERY,'(max-width:1023px)');
 globalThis.window={ScrollTrigger:{getById:id=>({
   'hero-journey':{start:0,end:1485},brands:{start:10000,end:11620},technology:{start:7000,end:9340}
 }[id])}};
@@ -31,4 +35,4 @@ equal(scrollTopFor(target('technology',{'.is-pinned':{id:'technology'}})),7000);
 equal(scrollTopFor(target('introduction',{})),null); // mobile/reduced-motion flow
 equal(scrollTopFor(target('brand-aouaou',{})),null);
 delete globalThis.window;
-console.log(`${assertions} motion state, reverse/skip, reduced-motion and deep-link assertions passed.`);
+console.log(`${assertions} motion state, reverse/skip, reduced-motion, mobile-layer and deep-link assertions passed.`);

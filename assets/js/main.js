@@ -2,6 +2,7 @@ import {createSmoothScroll} from './smooth-scroll.js';
 import {initNavigation} from './navigation.js';
 import {initAnimations,initVideo} from './animations.js';
 import {initPins} from './pin-scroll.js';
+import {initMobileMotion} from './mobile-motion.js';
 import {initSliders} from './sliders.js';
 import {initDetails} from './details.js';
 import {scrollTopFor} from './scroll-target.js';
@@ -22,6 +23,7 @@ function refreshMotion() {
   smooth=createSmoothScroll(reduced);
   cleanups.push(initPins(reduced,()=>smooth));
   cleanups.push(initAnimations(reduced));
+  cleanups.push(initMobileMotion(reduced));
   cleanups.push(initSliders(reduced));
   cleanups.push(initDetails(reduced));
   video.refresh();

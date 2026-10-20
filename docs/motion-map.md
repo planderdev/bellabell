@@ -14,6 +14,23 @@ Current configuration is in [메인 모션 고도화 보고서](motion-upgrade.m
 
 Five sibling timelines; zero nested pins. Each controls multiple visual elements, chapter state and progress where applicable. Desktop only (≥1024px); mobile and reduced motion use source flow. Lenis shares one GSAP ticker; refresh synchronizes Lenis size and chapter semantics.
 
+## Mobile motion layer (<1024px) — revision 4
+
+`assets/js/mobile-motion.js` runs inside `gsap.matchMedia('(max-width:1023px)')` and is the complement of the desktop pin breakpoint. No pins, no Lenis, no horizontal travel: every effect is transform, opacity or clip-path, so content stays in source order and scroll remains native. Reduced motion skips the whole layer, as on desktop.
+
+| Section | Trigger | Motion |
+| --- | --- | --- |
+| Hero | `.hero` top top → bottom top, scrub .4 | poster scale 1.12 drifts +7% Y; content lifts 48px and dims; scroll hint fades |
+| Introduction | `.introduction` top 78%, once | label/title/lines/copy/link rise 40px with .1s stagger; floating photo rises and settles at −4° |
+| Philosophy | each `.philosophy-scene` top 75%, once | image opens from the bottom (clip inset), img scale 1.18→1.08, word then title/copy rise; img parallax −4%→+4% over the scene; sticky chapter counter 01→03 switches at scene middle; progress bar scrubs over the stage |
+| Ingredients | each `.ingredient-card` top 82%, once | image opens from the bottom, img 1.15→1.06, number slides from +24px, category and copy stagger in |
+| Research | each `.research-scene` top 80%, once | image opens upward, img settles from +10% Y, copy rises; step track fills per stage (reverses on leave-back) |
+| Brands | `.brands-section` top 70%, once | each panel's artwork opens from a rounded aperture, image settles, copy staggers; Swiper navigation unchanged |
+| Sustainability | `.sustainability-image` top 85% → top 30%, scrub .5 | rounded 6% inset opens to full bleed, img 1.15→1; copy rises once at top 55% |
+| Global | `.global-section` top bottom → bottom top, scrub .6 | background −8%→+8% Y at scale 1.12; content drifts upward |
+
+CSS support lives at the end of `assets/css/home.css`: the chapter counter becomes `position:sticky` under the philosophy stage and the research step track is displayed in flow. `tests/motion.mjs` covers the reduced-motion no-op and the breakpoint string.
+
 The earlier fade/card-slide/video settings below are retained only as the **pre-upgrade comparison**. They are superseded by revision 3.
 
 ---

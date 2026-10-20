@@ -235,3 +235,9 @@
 @media(hover:hover) and (prefers-reduced-motion:no-preference){
  .business-card:hover .business-image img{transform:scale(1.04)}
 }
+@media(max-width:1023px){
+ /* Mobile motion layer: sticky chapter counter under the philosophy stage, research step track in flow. */
+ .chapter-progress{display:flex;position:sticky;top:auto;bottom:0;padding:var(--space-16) var(--responsive-space-24) var(--space-24);background:linear-gradient(0deg,var(--palette-grey-opacity-900),transparent);pointer-events:none}
+ .research-step-track{display:flex;gap:var(--space-8);margin-bottom:var(--responsive-space-24)}
+ .hero-media,.philosophy-image,.ingredient-image,.research-image,.brand-art,.sustainability-image{will-change:clip-path,transform}
+}
