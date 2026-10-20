@@ -109,6 +109,62 @@ export function initMobileMotion(reduced) {
         .fromTo('.global-background img',{yPercent:-8,scale:1.12},{yPercent:8,scale:1.12,duration:1},0)
         .fromTo('.global-content',{y:36},{y:-24,duration:1},0);
     }
+
+    // ---- Detail pages -------------------------------------------------------
+    // Shared helpers: an image box opens from the bottom while its photo settles.
+    const openMedia=(box,at=0,scaleTo=1.05)=>{
+      const img=box.querySelector('img');if(!img)return null;
+      return gsap.timeline({scrollTrigger:once(box,'top 85%')})
+        .fromTo(box,{clipPath:'inset(0% 0% 100% 0%)'},open(box,1),at)
+        .fromTo(img,{scale:1.15},{scale:scaleTo,duration:1.3,ease:'power2.out'},at);
+    };
+    const rise=(targets,trigger,start='top 85%',stagger=.08)=>{
+      const list=gsap.utils.toArray(targets);if(!list.length)return;
+      gsap.from(list,{y:24,autoAlpha:0,duration:.65,stagger,ease:'power2.out',scrollTrigger:once(trigger,start)});
+    };
+
+    // Company: the three fanned photos rise in and spread as the reader scrolls.
+    const fan=document.querySelector('.company-fan');
+    if(fan){
+      [['.fan-left',-1],['.fan-center',0],['.fan-right',1]].forEach(([selector,dir])=>{
+        const el=fan.querySelector(selector);if(!el)return;
+        const r0=gsap.getProperty(el,'rotation'),x0=gsap.getProperty(el,'x'),y0=gsap.getProperty(el,'y');
+        gsap.fromTo(el,{rotation:r0,x:x0,y:y0+40,autoAlpha:0},
+          {rotation:r0*1.6,x:x0-dir*20,y:dir?y0:y0-16,autoAlpha:1,ease:'none',scrollTrigger:scrub(fan,'top 90%','bottom 30%',.6)});
+      });
+    }
+
+    // Story cards (company, technology): each card opens, its label/title/copy follow,
+    // and the photo keeps a light parallax across the card.
+    document.querySelectorAll('.detail-story-card').forEach((card,i)=>{
+      const box=card.querySelector('.detail-story-image');
+      const tl=openMedia(box,0,1.05);
+      if(tl)tl.from(card.querySelectorAll('.detail-story-copy>*'),{y:20,autoAlpha:0,duration:.55,stagger:.08,ease:'power2.out'},.35);
+      const img=box?.querySelector('img');
+      if(img)gsap.fromTo(img,{yPercent:-3},{yPercent:3,ease:'none',scrollTrigger:scrub(card,'top bottom','bottom top',.4)});
+    });
+
+    // Portfolio cards (business, brands) and ingredient index: media apertures on top of the existing card fade.
+    document.querySelectorAll('.portfolio-media,.ingredient-index-image,.impact-value-image').forEach(box=>openMedia(box));
+    document.querySelectorAll('.portfolio-arrow').forEach(arrow=>{
+      gsap.from(arrow,{scale:.6,autoAlpha:0,duration:.5,ease:'back.out(2)',scrollTrigger:once(arrow.closest('.portfolio-card'),'top 70%')});
+    });
+
+    // Sustainability cover opens from a rounded inset like the home narrative.
+    const impact=document.querySelector('.impact-image');
+    if(impact){
+      gsap.timeline({defaults:{ease:'none'},scrollTrigger:scrub(impact,'top 90%','top 30%',.5)})
+        .fromTo(impact,{clipPath:`inset(6% 6% 6% 6% round ${radius})`},{clipPath:`inset(0% 0% 0% 0% round ${radius})`,duration:1},0)
+        .fromTo(impact.querySelector('img'),{scale:1.15,yPercent:4},{scale:1,yPercent:0,duration:1},0);
+    }
+
+    // Lists: partners, news, FAQ, CTA and contact copy rise in sequence.
+    rise('.partners-list>p','.partners-list');
+    document.querySelectorAll('.news-item').forEach(item=>rise(item,item,'top 90%'));
+    document.querySelectorAll('.faq-item').forEach(item=>rise(item,item,'top 92%'));
+    rise('.detail-cta>*','.detail-cta','top 85%',.12);
+    rise('.contact-aside>*','.contact-aside');
+    rise('.contact-form','.contact-form','top 88%');
     return ()=>cleanups.forEach(fn=>fn());
   });
   return ()=>mm.revert();

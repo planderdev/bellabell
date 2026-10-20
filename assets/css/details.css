@@ -132,3 +132,7 @@
  .contact-form{grid-template-columns:1fr}.form-submit{gap:var(--space-16)}.form-submit .button{width:100%}.form-submit .form-help{max-width:none}
 }
 @media(hover:hover) and (prefers-reduced-motion:no-preference){.portfolio-card:hover .portfolio-media>img{transform:scale(1.04)}}
+@media(max-width:1023px){
+ /* Mobile motion layer on detail pages (assets/js/mobile-motion.js). */
+ .detail-story-image,.portfolio-media,.ingredient-index-image,.impact-image,.impact-value-image{will-change:clip-path,transform}
+}

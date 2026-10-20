@@ -29,6 +29,16 @@ Five sibling timelines; zero nested pins. Each controls multiple visual elements
 | Sustainability | `.sustainability-image` top 85% → top 30%, scrub .5 | rounded 6% inset opens to full bleed, img 1.15→1; copy rises once at top 55% |
 | Global | `.global-section` top bottom → bottom top, scrub .6 | background −8%→+8% Y at scale 1.12; content drifts upward |
 
+Detail pages share the same layer (the module runs on every page and skips sections that are absent):
+
+| Page / element | Trigger | Motion |
+| --- | --- | --- |
+| Company photo fan | `.company-fan` top 90% → bottom 30%, scrub .6 | three photos rise from +40px and spread: rotation ×1.6 from the CSS base, outer photos drift ∓20px, centre lifts 16px |
+| Story cards (company, technology) | each `.detail-story-card` top 85%, once | image opens from the bottom, img 1.15→1.05, label/title/copy stagger; img parallax −3%→+3% across the card |
+| Portfolio / ingredient index / impact value media | each box top 85%, once | aperture from the bottom with img 1.15→1.05, on top of the existing card fade; portfolio arrow pops in (back.out) |
+| Sustainability cover | `.impact-image` top 90% → top 30%, scrub .5 | rounded 6% inset opens to the box edge, img 1.15→1 |
+| Partners, news items, FAQ items, CTA, contact | each list/item top 85–92%, once | rise 24px with stagger |
+
 CSS support lives at the end of `assets/css/home.css`: the chapter counter becomes `position:sticky` under the philosophy stage and the research step track is displayed in flow. `tests/motion.mjs` covers the reduced-motion no-op and the breakpoint string.
 
 The earlier fade/card-slide/video settings below are retained only as the **pre-upgrade comparison**. They are superseded by revision 3.
