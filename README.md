@@ -81,6 +81,15 @@ GitHub Actions(`.github/workflows/ci.yml`)가 `main` 브랜치와 PR마다 PHP 8
 
 로컬 테스트에서는 외부로 전송하지 않고 `127.0.0.1` SMTP 테스트 서버에서 합성 메일 1건을 받습니다. 실제 SMTP 인증, 외부 수신함 도달 및 SPF/DKIM/DMARC는 운영 환경에서 확인해야 합니다.
 
+## 문의 관리 화면
+
+`/admin`에서 문의를 확인하고 처리 완료로 표시합니다. `DATABASE_URL`, `APP_SECRET`, `ADMIN_PASSWORD_HASH`가 모두 있어야 열리며, 하나라도 없으면 503 안내만 보입니다.
+
+- 비밀번호 1개를 팀이 공유합니다. 해시 생성: `php -r "echo password_hash('비밀번호', PASSWORD_DEFAULT);"`
+- 로그인 세션은 서명된 쿠키(12시간, `/admin` 경로, HttpOnly, SameSite=Strict)이며 서버 저장소가 없습니다. 로그인 시도는 IP당 1시간 5회로 제한됩니다.
+- 목록은 미처리 / 처리 완료 / 전체 탭, 이름·회사·이메일·내용 검색, 50건 단위 페이지로 봅니다. 처리 완료는 `contact_enquiries.handled_at`에 기록됩니다.
+- 검색엔진에는 `noindex`와 robots `Disallow: /admin`으로 숨깁니다. 화면 문구는 한국어 고정입니다.
+
 ## 검사
 
 ```bash

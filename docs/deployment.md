@@ -22,6 +22,7 @@ vercel --prod          # 운영 배포
 | `TRUST_PROXY_HTTPS` | `1` (Vercel이 TLS를 종료하므로 필수) |
 | `MAIL_*`, `SMTP_*` | 문의 메일 설정 |
 | `DATABASE_URL` | PostgreSQL 연결 문자열 (선택, 권장) |
+| `ADMIN_PASSWORD_HASH` | `/admin` 문의 관리 화면 비밀번호의 `password_hash()` 결과 |
 
 서버리스 특성상 PHP 세션과 로컬 파일은 인스턴스 간에 공유되지 않습니다. 문의 폼은 세션 없는 HMAC 토큰을 쓰며, 요청 제한과 토큰 1회성 검사는 `DATABASE_URL`이 있을 때 DB에서 공유됩니다. DB가 없으면 인스턴스별 `/tmp` 파일 제한만 동작하므로 운영에서는 DB 설정을 권장합니다.
 

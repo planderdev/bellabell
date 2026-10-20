@@ -2,7 +2,7 @@
 declare(strict_types=1);
 // Liveness/readiness probe for load balancers and deploy checks. No cookies, no secrets.
 define('APP_ROOT', __DIR__);
-require_once APP_ROOT . '/includes/contact-handler.php';
+require_once APP_ROOT . '/includes/admin-handler.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store, max-age=0');
 header('X-Robots-Tag: noindex, nofollow');
@@ -19,5 +19,6 @@ echo json_encode([
         'mail' => mail_ready(),
         'database' => db_ready(),
         'contact_form' => contact_ready(),
+        'admin' => admin_ready(),
     ],
 ], JSON_UNESCAPED_SLASHES);

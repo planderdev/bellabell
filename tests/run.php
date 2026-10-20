@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 define('APP_ROOT',dirname(__DIR__));
-require APP_ROOT.'/includes/contact-handler.php';
+require APP_ROOT.'/includes/admin-handler.php';
 $tests=0;$failures=[];
 function check(bool $condition,string $message): void {
     global $tests,$failures;$tests++;
@@ -60,6 +60,29 @@ check(!valid_contact_token($post,104,contact_token_nonce($token)),'Used nonce ac
 check(valid_contact_token($post,104,str_repeat('f',32)),'Different nonce rejected');
 check(contact_token_nonce($token)===substr($token,8,32),'Nonce extraction');
 check(contact_token_nonce('short')==='','Nonce from bad token');
+// Admin desk: signed session cookie, session-bound form token, hourly login token.
+$secret=str_repeat('s',40);
+$session=admin_session_value(1000,$secret);
+check(preg_match('/^\d+\.[a-f0-9]{64}$/',$session)===1,'Admin session format');
+check(admin_session_valid($session,1000+ADMIN_SESSION_TTL-1,$secret),'Valid admin session rejected');
+check(!admin_session_valid($session,1000+ADMIN_SESSION_TTL,$secret),'Expired admin session accepted');
+check(!admin_session_valid($session,1001,'other-secret-other-secret-other-secret'),'Admin session with wrong secret accepted');
+check(!admin_session_valid(substr($session,0,-1).(substr($session,-1)==='0'?'1':'0'),1001,$secret),'Tampered admin session accepted');
+check(!admin_session_valid('',1001,$secret) && !admin_session_valid('abc',1001,$secret),'Garbage admin session accepted');
+$form=admin_form_token($session,$secret);
+check(admin_form_token_valid($form,$session,$secret),'Valid admin form token rejected');
+check(!admin_form_token_valid($form,admin_session_value(2000,$secret),$secret),'Form token accepted for another session');
+check(!admin_form_token_valid('',$session,$secret),'Empty form token accepted');
+$login=admin_login_token(7200,$secret);
+check(admin_login_token_valid($login,7200+3599,$secret),'Login token rejected in same hour');
+check(admin_login_token_valid($login,7200+3600,$secret),'Login token rejected in next hour');
+check(!admin_login_token_valid($login,7200+7200,$secret),'Login token accepted two hours later');
+check(!admin_login_token_valid('nope',7200,$secret),'Bad login token accepted');
+putenv('ADMIN_PASSWORD_HASH=');check(!admin_verify_password('anything'),'Password verified without hash');
+putenv('ADMIN_PASSWORD_HASH='.password_hash('correct horse',PASSWORD_DEFAULT));
+check(admin_verify_password('correct horse') && !admin_verify_password('wrong') && !admin_verify_password(''),'Password verification');
+putenv('ADMIN_PASSWORD_HASH=not-a-hash');check(admin_password_hash()==='' && !admin_verify_password('x'),'Malformed hash treated as unset');
+putenv('ADMIN_PASSWORD_HASH');
 $rateDir=sys_get_temp_dir().'/bellabell-test-'.bin2hex(random_bytes(5));
 for($i=0;$i<5;$i++) check(contact_rate_allowed('127.0.0.55',10000+$i,$rateDir),'Early rate limit');
 check(!contact_rate_allowed('127.0.0.55',10010,$rateDir),'Sixth request not limited');

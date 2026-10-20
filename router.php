@@ -13,6 +13,7 @@ if (preg_match('~^/assets/[a-zA-Z0-9_./-]+\.(?:css|js|svg|png|jpg|jpeg|webp|avif
     http_response_code(404); exit;
 }
 if ($path === '/healthz') { require __DIR__ . '/healthz.php'; exit; }
+if (preg_match('~^/admin(?:/([a-z]+))?/?$~', $path, $m)) { $adminPath = $m[1] ?? ''; require __DIR__ . '/admin.php'; exit; }
 if ($path === '/robots.txt') { require __DIR__ . '/robots.php'; exit; }
 if ($path === '/sitemap.xml') { require __DIR__ . '/sitemap.php'; exit; }
 $pages = ['company', 'business', 'technology', 'sustainability', 'brands', 'news', 'contact', 'privacy', 'faq'];
