@@ -59,7 +59,7 @@ export function initPins(reduced, getScroll) {
         .to('.hero-brand-line:nth-child(1)',{xPercent:-16,y:-90,duration:1.15},.1)
         .to('.hero-brand-line:nth-child(2)',{xPercent:22,y:-45,duration:1.15},.1)
         .to('.hero h1',{y:-85,clipPath:'inset(0% 0% 100% 0%)',duration:.65},.25)
-        .to('.hero .eyebrow,.hero-description,.hero .button',{y:-30,autoAlpha:0,duration:.45},.2)
+        .to('.hero-description,.hero .button',{y:-30,autoAlpha:0,duration:.45},.2)
         .to('.hero-brand',{autoAlpha:0,duration:.35},.7)
         .to('.hero-media',{clipPath:`inset(18% 62% 14% 5% round ${mediaRadius})`,duration:1.2,ease:'power2.inOut'},.35)
         .to('.hero-shade',{opacity:.05,duration:.8},.5)

@@ -19,7 +19,8 @@ for(const [key,value] of Object.entries({...upstream.global,...upstream.light}))
 assert.equal(actual.brand,'#00AF84');count++;
 const context={UI:{}};
 vm.runInNewContext(fs.readFileSync('design-system/base-ui/brand-source.js','utf8'),context);
-assert.ok(context.UI.color.contrast(actual.brand,actual['brand-on'])>=4.5);
+// Requested white foreground is a deliberate brand choice, not an AA contrast claim.
+assert.equal(actual['brand-on'],'#FFFFFF');
 assert.ok(context.UI.color.contrast(actual['brand-ink'],'#FFFFFF')>=4.5);count+=2;
 for(const legacy of ['components','responsive','animations','home-motion']){
   assert.equal(fs.existsSync(`assets/css/${legacy}.css`),false,`Legacy layer still exists: ${legacy}`);count++;
@@ -30,3 +31,4 @@ for(const file of ['base','layout','home','details']){
   assert.doesNotMatch(source,/#[\da-f]{3,8}\b|rgba?\(/i,'Page styles must use BASE UI colors');count+=2;
 }
 console.log(`${count} design-system token, contrast and replacement assertions passed.`);
+console.log(`Requested brand/white contrast: ${context.UI.color.contrast(actual.brand,actual['brand-on']).toFixed(2)}:1 (below 4.5:1).`);

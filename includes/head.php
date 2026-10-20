@@ -25,6 +25,7 @@ $canonicalPath = url($page === 'home' ? '' : $page);
     <meta property="og:image" content="<?= e($appUrl . asset($media['hero']['file'])) ?>">
     <?php if ($page === 'home'): ?><link rel="preload" as="image" href="<?= e(asset($media['hero']['file'])) ?>"><?php endif; ?>
     <link rel="preload" href="<?= e(asset('fonts/PretendardVariable.woff2')) ?>" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="<?= e(asset('fonts/Raleway-Latin-Variable.woff2')) ?>" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="<?= e(asset('vendor/lenis.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('vendor/swiper-bundle.min.css')) ?>">
     <?php foreach (['tokens','ui','base','layout',$page === 'home' ? 'home' : 'details'] as $css): ?>

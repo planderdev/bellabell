@@ -7,12 +7,12 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const source=path.join(root,'design-system/base-ui');
 const read=name=>fs.readFileSync(path.join(source,name),'utf8');
 const tokens=JSON.parse(read('tokens.json'));
-// Use BASE UI's own brand adapter at build time. No runtime override/style injection.
+// Use BASE UI's brand adapter at build time; the source token owns the requested white foreground.
 const context={UI:{}};
 vm.runInNewContext(read('brand-source.js'),context);
 const brand=context.UI.brandConfig('#00AF84');
 const values={...tokens.global,...tokens.light,
-  brand:brand.seed,'brand-on':brand.on,'brand-ink':brand.inkLight,
+  brand:brand.seed,'brand-on':tokens.global['brand-on'],'brand-ink':brand.inkLight,
   'brand-progress':brand.progress,'brand-hover':brand.hover,'brand-pressed':brand.pressed,
   'brand-tint':brand.tintLight,'brand-tint-dark':brand.tintDark,'brand-inverse':brand.inverse};
 const notice=read('NOTICE.txt').replaceAll('{version}',tokens.version);
@@ -28,4 +28,4 @@ for(const [name,content] of Object.entries(outputs)){
     if(!fs.existsSync(target)||fs.readFileSync(target,'utf8')!==content)throw Error(`Stale design-system output: ${name}`);
   }else fs.writeFileSync(target,content);
 }
-console.log(`BASE UI ${tokens.version}: ${Object.keys(values).length} tokens, ${modules.length} components, primary ${brand.seed}, button text ${brand.on}, text accent ${brand.inkLight}.`);
+console.log(`BASE UI ${tokens.version}: ${Object.keys(values).length} tokens, ${modules.length} components, primary ${brand.seed}, button text ${values['brand-on']}, text accent ${brand.inkLight}.`);

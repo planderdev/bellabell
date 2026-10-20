@@ -10,7 +10,7 @@ return [
         'brandSignature'=>'FROM JEJU TO THE FUTURE','pageLabel'=>'Page','back'=>'Go back',
     ],
     'nav'=>['company'=>'Our story','business'=>'Business','technology'=>'Research','sustainability'=>'Our impact','brands'=>'Brands','news'=>'Stories','contact'=>'Contact','privacy'=>'Privacy policy'],
-    'hero'=>['eyebrow'=>'FROM JEJU TO THE FUTURE','title'=>"From Jeju,\nto a better tomorrow.",'description'=>"Exploring nature’s potential.\nCreating better everyday lives, together with our pets.",'cta'=>'Discover Bellabell Farm','caption'=>'Possibilities found in nature. Meaning brought to everyday life.'],
+    'hero'=>['title'=>"From Jeju,\nto a better tomorrow.",'description'=>"Exploring nature’s potential.\nCreating better everyday lives, together with our pets.",'cta'=>'Discover Bellabell Farm'],
     'intro'=>['label'=>'Where we begin','title'=>"An island of possibilities.\nA world of everyday good.",'line1'=>'Discovered in Jeju’s nature.','line2'=>'Developed through research.','line3'=>'Made for our lives together.','description'=>'In the Jeju language, Bellabell speaks of variety and being different. With local ingredients and fresh thinking, we connect the well-being of pets, people and our community.','link'=>'Our story'],
     'philosophy'=>[
         'label'=>'OUR PHILOSOPHY','title'=>'From nature to everyday life',

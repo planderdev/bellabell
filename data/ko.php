@@ -10,7 +10,7 @@ return [
         'brandSignature'=>'FROM JEJU TO THE FUTURE','pageLabel'=>'페이지','back'=>'이전으로',
     ],
     'nav'=>['company'=>'기업소개','business'=>'사업영역','technology'=>'연구·기술','sustainability'=>'지속가능경영','brands'=>'브랜드','news'=>'소식','contact'=>'문의하기','privacy'=>'개인정보처리방침'],
-    'hero'=>['eyebrow'=>'FROM JEJU TO THE FUTURE','title'=>"제주에서 시작해,\n더 나은 내일로.",'description'=>"자연의 가능성을 연구하고,\n반려동물과 함께하는 건강한 일상을 만듭니다.",'cta'=>'벨아벨팜 알아보기','caption'=>'자연에서 발견한 가능성, 일상에 전하는 가치.'],
+    'hero'=>['title'=>"제주에서 시작해,\n더 나은 내일로.",'description'=>"자연의 가능성을 연구하고,\n반려동물과 함께하는 건강한 일상을 만듭니다.",'cta'=>'벨아벨팜 알아보기'],
     'intro'=>['label'=>'우리의 시작','title'=>"아름다운 섬의 가능성이\n우리의 일상이 되도록.",'line1'=>'제주의 자연에서 발견하고,','line2'=>'연구로 가치를 더하고,','line3'=>'함께하는 일상으로 이어갑니다.','description'=>'제주어로 ‘여러 가지, 보통과 다른’을 뜻하는 벨아벨. 우리는 제주 원료와 새로운 생각으로 반려동물과 사람, 지역이 함께하는 내일을 만들어갑니다.','link'=>'우리의 이야기'],
     'philosophy'=>[
         'label'=>'OUR PHILOSOPHY','title'=>'자연에서 일상까지',

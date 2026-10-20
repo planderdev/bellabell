@@ -10,7 +10,7 @@ return [
         'brandSignature'=>'FROM JEJU TO THE FUTURE','pageLabel'=>'页面','back'=>'返回',
     ],
     'nav'=>['company'=>'关于我们','business'=>'业务领域','technology'=>'研究与技术','sustainability'=>'共同价值','brands'=>'旗下品牌','news'=>'最新动态','contact'=>'联系我们','privacy'=>'隐私政策'],
-    'hero'=>['eyebrow'=>'FROM JEJU TO THE FUTURE','title'=>"源于济州，\n走向美好明天。",'description'=>"探索自然的潜力，\n创造人与宠物共享的健康日常。",'cta'=>'认识 BELLABELL FARM','caption'=>'从自然中发现可能，为日常生活传递价值。'],
+    'hero'=>['title'=>"源于济州，\n走向美好明天。",'description'=>"探索自然的潜力，\n创造人与宠物共享的健康日常。",'cta'=>'认识 BELLABELL FARM'],
     'intro'=>['label'=>'我们的起点','title'=>"让一座岛屿的可能，\n成为日常的美好。",'line1'=>'在济州自然中发现，','line2'=>'以研究赋予价值，','line3'=>'融入彼此相伴的日常。','description'=>'在济州方言中，Bellabell 有“多种多样、与众不同”之意。我们以本地原料与新的思考，连接宠物、人和社区的未来。','link'=>'我们的故事'],
     'philosophy'=>[
         'label'=>'OUR PHILOSOPHY','title'=>'从自然到日常',
