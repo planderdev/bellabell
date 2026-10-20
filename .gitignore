@@ -4,3 +4,4 @@ node_modules/
 .runtime/
 tools/composer.phar
 *.log
+.vercel
