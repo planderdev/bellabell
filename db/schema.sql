@@ -28,3 +28,18 @@ create index if not exists contact_enquiries_created on contact_enquiries (creat
 -- Lock both tables down for Supabase's anon/authenticated API roles. The PHP app uses the direct Postgres role.
 alter table contact_attempts  enable row level security;
 alter table contact_enquiries enable row level security;
+
+-- Dedicated least-privilege login for the website (DATABASE_URL). Replace the password before running.
+-- It owns the two tables, so RLS does not block it, while Supabase's anon/authenticated API roles get nothing.
+-- On Supabase the "postgres" role is not a superuser, so it must be granted membership before changing ownership.
+do $$
+begin
+  if not exists (select 1 from pg_roles where rolname = 'bellabell_app') then
+    create role bellabell_app login password 'REPLACE_ME' nosuperuser nocreatedb nocreaterole noinherit;
+  end if;
+end $$;
+grant bellabell_app to postgres;
+grant usage, create on schema public to bellabell_app;
+alter table contact_attempts  owner to bellabell_app;
+alter table contact_enquiries owner to bellabell_app;
+grant usage, select on sequence contact_attempts_id_seq, contact_enquiries_id_seq to bellabell_app;
