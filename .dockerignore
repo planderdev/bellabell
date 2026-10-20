@@ -1,0 +1,17 @@
+.git
+.github
+node_modules
+vendor
+docs
+tests
+tools
+design-system
+db
+.runtime
+.env
+*.md
+compose.yaml
+api
+vercel.json
+.vercelignore
+.vercel

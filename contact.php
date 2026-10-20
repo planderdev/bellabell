@@ -2,40 +2,41 @@
 $page = 'contact';
 require __DIR__ . '/includes/bootstrap.php';
 require_once APP_ROOT . '/includes/contact-handler.php';
-session_name('bellabell_session');
-session_set_cookie_params(['lifetime'=>0,'path'=>'/','secure'=>$isHttps,'httponly'=>true,'samesite'=>'Lax']);
-ini_set('session.use_strict_mode','1');
-session_start();
 header('Cache-Control: no-store, max-age=0');
 $errors=[];
 $generalError='';
-$success=($_SESSION['contact_sent']??false)===true;
-unset($_SESSION['contact_sent']);
+$success=($_GET['sent']??'')==='1';
 $formData=['name'=>'','company'=>'','email'=>'','type'=>'','message'=>'','consent'=>''];
-$ready=mail_ready();
+$ready=contact_ready();
+$usedNonce=preg_match('/^[a-f0-9]{32}$/',(string)($_COOKIE['bellabell_contact_used']??''))?$_COOKIE['bellabell_contact_used']:'';
+$clientIp=$_SERVER['REMOTE_ADDR']??'unknown';
 if ($_SERVER['REQUEST_METHOD']==='POST') {
+    $nonce=contact_token_nonce(contact_value($_POST,'csrf'));
     if ((int)($_SERVER['CONTENT_LENGTH']??0)>32768) {
         http_response_code(413);$generalError='securityError';
-    } elseif (!valid_contact_token($_POST,$_SESSION)) {
+    } elseif (!valid_contact_token($_POST,null,$usedNonce)) {
         http_response_code(419);$generalError='securityError';
-    } elseif (!contact_rate_allowed($_SERVER['REMOTE_ADDR']??'unknown')) {
+    } elseif (!contact_rate_allowed($clientIp,null,null,$nonce)) {
         http_response_code(429);header('Retry-After: 3600');$generalError='rateError';
     } else {
         foreach ($formData as $key=>$unused) $formData[$key]=contact_value($_POST,$key);
         $errors=validate_contact($formData);
         if ($errors) {http_response_code(422);}
         elseif (!$ready) {http_response_code(503);$generalError='notice';}
-        elseif (send_contact_email($formData,$lang)) {
-            unset($_SESSION['contact_csrf'],$_SESSION['contact_issued']);
-            $_SESSION['contact_sent']=true;
-            header('Location: '.url('contact'),true,303);exit;
-        } else {http_response_code(502);$generalError='failed';}
+        else {
+            $mailed=send_contact_email($formData,$lang);
+            $stored=store_contact_enquiry($formData,$lang,$clientIp,$mailed);
+            if ($mailed || $stored) {
+                // Mark the token as used for this browser so a resubmit of the same form is rejected.
+                setcookie('bellabell_contact_used',$nonce,['expires'=>time()+7200,'path'=>'/','secure'=>$isHttps,'httponly'=>true,'samesite'=>'Lax']);
+                header('Location: '.url('contact').'?sent=1',true,303);exit;
+            }
+            http_response_code(502);$generalError='failed';
+        }
     }
 }
-if (!isset($_SESSION['contact_csrf']) || time()-($_SESSION['contact_issued']??0)>7200) {
-    $_SESSION['contact_csrf']=bin2hex(random_bytes(32));
-    $_SESSION['contact_issued']=time();
-}
+$csrfToken=issue_contact_token();
+if ($csrfToken==='') { $ready=false; }
 require APP_ROOT . '/includes/head.php';
 require APP_ROOT . '/includes/header.php';
 ?>
@@ -48,7 +49,7 @@ require APP_ROOT . '/includes/header.php';
         <?php if (!$ready): ?><div class="contact-notice" role="status"><?= e(t('contact.notice')) ?></div><?php endif; ?>
         <?php if ($errors || $generalError): ?><div class="form-errors" role="alert" tabindex="-1"><p><?= e(t('contact.' . ($generalError ?: 'invalid'))) ?></p><?php if ($errors): ?><ul><?php foreach ($errors as $field=>$error): ?><li><a href="#field-<?= e($field) ?>"><?= e(t('contact.'.$error)) ?></a></li><?php endforeach; ?></ul><?php endif; ?></div><?php endif; ?>
         <form class="contact-form" action="<?= e(url('contact')) ?>" method="post">
-            <input type="hidden" name="csrf" value="<?= e($_SESSION['contact_csrf']) ?>">
+            <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
             <div class="trap-field" aria-hidden="true"><label for="website"><?= e(t('contact.trap')) ?></label><input type="text" name="website" id="website" tabindex="-1" autocomplete="off"></div>
             <h3 class="form-section-title form-wide"><?= e(t('detail.contact.information')) ?></h3>
             <?php foreach (['name'=>['text','name',80,true],'company'=>['text','organization',120,false],'email'=>['email','email',254,true]] as $field=>$settings): ?>

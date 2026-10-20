@@ -20,7 +20,9 @@ if (parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) === '/') {
     $preferred = is_string($preferred) && isset($supportedLanguages[$preferred]) ? $preferred : 'ko';
     header('Location: /' . $preferred . '/', true, 302); exit;
 }
-$isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+$isHttps = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    // Only trust the forwarded protocol when the host explicitly terminates TLS in front of PHP (Vercel, a reverse proxy).
+    || (getenv('TRUST_PROXY_HTTPS') === '1' && strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https');
 if (PHP_SAPI !== 'cli' && ($_COOKIE['bellabell_language'] ?? '') !== $lang) {
     setcookie('bellabell_language', $lang, ['expires'=>time()+31536000,'path'=>'/','secure'=>$isHttps,'httponly'=>true,'samesite'=>'Lax']);
 }

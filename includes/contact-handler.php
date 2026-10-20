@@ -22,16 +22,104 @@ function validate_contact(array $input): array {
     if (contact_value($input,'consent') !== '1') $errors['consent']='consentError';
     return $errors;
 }
-function valid_contact_token(array $input, array $session, ?int $now=null): bool {
-    $token=contact_value($input,'csrf');
-    $issued=$session['contact_issued']??0;
-    $age=($now??time())-(is_int($issued)?$issued:0);
-    return isset($session['contact_csrf']) && is_string($session['contact_csrf'])
-        && $token !== '' && hash_equals($session['contact_csrf'],$token)
-        && $age>=3 && $age<=7200 && contact_value($input,'website')==='';
+
+// ---------------------------------------------------------------------------
+// Stateless CSRF token: hex(issued-at, 8) . nonce(32 hex) . hmac-sha256(64 hex).
+// No server-side session is required, so the form works on serverless hosts.
+// ---------------------------------------------------------------------------
+function contact_secret(): string {
+    $secret = getenv('APP_SECRET') ?: '';
+    if ($secret !== '' && strlen($secret) >= 32) return $secret;
+    if (getenv('APP_ENV') === 'production') return '';
+    // Local development/test fallback. Production must set APP_SECRET (>= 32 chars).
+    return hash('sha256', 'bellabell-local:' . APP_ROOT);
 }
-function contact_rate_allowed(string $ip, ?int $now=null, ?string $directory=null): bool {
+function contact_token_signature(string $issued, string $nonce, string $secret): string {
+    return hash_hmac('sha256', $issued . $nonce, $secret);
+}
+function issue_contact_token(?int $now = null): string {
+    $secret = contact_secret();
+    if ($secret === '') return '';
+    $issued = str_pad(dechex($now ?? time()), 8, '0', STR_PAD_LEFT);
+    $nonce = bin2hex(random_bytes(16));
+    return $issued . $nonce . contact_token_signature($issued, $nonce, $secret);
+}
+function contact_token_nonce(string $token): string {
+    return strlen($token) === 104 ? substr($token, 8, 32) : '';
+}
+function valid_contact_token(array $input, ?int $now = null, string $usedNonce = ''): bool {
+    $token = contact_value($input, 'csrf');
+    $secret = contact_secret();
+    if ($secret === '' || !preg_match('/^[a-f0-9]{104}$/', $token)) return false;
+    $issued = substr($token, 0, 8);
+    $nonce = substr($token, 8, 32);
+    $signature = substr($token, 40, 64);
+    if (!hash_equals(contact_token_signature($issued, $nonce, $secret), $signature)) return false;
+    if ($usedNonce !== '' && hash_equals($usedNonce, $nonce)) return false;
+    $age = ($now ?? time()) - (int)hexdec($issued);
+    return $age >= 3 && $age <= 7200 && contact_value($input, 'website') === '';
+}
+
+// ---------------------------------------------------------------------------
+// Optional PostgreSQL storage (DATABASE_URL). Used for enquiry persistence,
+// shared rate limiting and single-use token enforcement across instances.
+// ---------------------------------------------------------------------------
+function db_ready(): bool {
+    return (bool)getenv('DATABASE_URL') && extension_loaded('pdo_pgsql');
+}
+function db_connection(): ?\PDO {
+    static $pdo = null;
+    static $failed = false;
+    if ($pdo instanceof \PDO) return $pdo;
+    if ($failed || !db_ready()) return null;
+    $parts = parse_url((string)getenv('DATABASE_URL'));
+    if (!is_array($parts) || empty($parts['host'])) { $failed = true; return null; }
+    $dsn = 'pgsql:host=' . $parts['host'] . ';port=' . ($parts['port'] ?? 5432) . ';dbname=' . ltrim($parts['path'] ?? '/postgres', '/');
+    parse_str($parts['query'] ?? '', $query);
+    $dsn .= ';sslmode=' . (preg_match('/^[a-z-]+$/', (string)($query['sslmode'] ?? '')) ? $query['sslmode'] : 'require');
+    try {
+        $pdo = new \PDO($dsn, rawurldecode($parts['user'] ?? ''), rawurldecode($parts['pass'] ?? ''), [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_TIMEOUT => 5,
+        ]);
+        return $pdo;
+    } catch (\Throwable $exception) {
+        $failed = true;
+        error_log('Contact database connection failed (' . get_class($exception) . ').');
+        return null;
+    }
+}
+function contact_ip_hash(string $ip): string {
+    return hash('sha256', $ip . '|' . contact_secret());
+}
+function contact_rate_allowed_db(\PDO $pdo, string $ip, string $nonce): bool {
+    try {
+        $ipHash = contact_ip_hash($ip);
+        $pdo->beginTransaction();
+        $pdo->exec("DELETE FROM contact_attempts WHERE created_at < now() - interval '1 day'");
+        if ($nonce !== '') {
+            $exists = $pdo->prepare('SELECT 1 FROM contact_attempts WHERE nonce = :nonce LIMIT 1');
+            $exists->execute(['nonce' => $nonce]);
+            if ($exists->fetchColumn()) { $pdo->rollBack(); return false; }
+        }
+        $count = $pdo->prepare("SELECT count(*) FROM contact_attempts WHERE ip_hash = :ip AND created_at > now() - interval '1 hour'");
+        $count->execute(['ip' => $ipHash]);
+        if ((int)$count->fetchColumn() >= 5) { $pdo->rollBack(); return false; }
+        $insert = $pdo->prepare('INSERT INTO contact_attempts (ip_hash, nonce) VALUES (:ip, :nonce)');
+        $insert->execute(['ip' => $ipHash, 'nonce' => $nonce !== '' ? $nonce : null]);
+        $pdo->commit();
+        return true;
+    } catch (\Throwable $exception) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        error_log('Contact rate check failed (' . get_class($exception) . ').');
+        return false;
+    }
+}
+function contact_rate_allowed(string $ip, ?int $now=null, ?string $directory=null, string $nonce=''): bool {
     $now ??= time();
+    if ($directory === null && ($pdo = db_connection()) instanceof \PDO) {
+        return contact_rate_allowed_db($pdo, $ip, $nonce);
+    }
     $directory ??= getenv('CONTACT_RATE_DIR') ?: sys_get_temp_dir() . '/bellabell-rate-' . substr(hash('sha256',APP_ROOT),0,16);
     if (!is_dir($directory) && !@mkdir($directory,0700,true) && !is_dir($directory)) return false;
     $rootReal=realpath(APP_ROOT);
@@ -57,6 +145,28 @@ function contact_rate_allowed(string $ip, ?int $now=null, ?string $directory=nul
         return true;
     } finally {flock($handle,LOCK_UN);fclose($handle);}
 }
+function store_contact_enquiry(array $input, string $locale, string $ip, bool $mailSent): bool {
+    $pdo = db_connection();
+    if (!$pdo instanceof \PDO) return false;
+    try {
+        $statement = $pdo->prepare('INSERT INTO contact_enquiries (locale, name, company, email, type, message, ip_hash, user_agent, mail_sent)
+            VALUES (:locale, :name, :company, :email, :type, :message, :ip_hash, :user_agent, :mail_sent)');
+        $statement->bindValue('locale', $locale);
+        $statement->bindValue('name', contact_value($input, 'name'));
+        $statement->bindValue('company', contact_value($input, 'company'));
+        $statement->bindValue('email', contact_value($input, 'email'));
+        $statement->bindValue('type', contact_value($input, 'type'));
+        $statement->bindValue('message', contact_value($input, 'message'));
+        $statement->bindValue('ip_hash', contact_ip_hash($ip));
+        $statement->bindValue('user_agent', mb_substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 512));
+        $statement->bindValue('mail_sent', $mailSent, \PDO::PARAM_BOOL);
+        return $statement->execute();
+    } catch (\Throwable $exception) {
+        error_log('Contact enquiry storage failed (' . get_class($exception) . ').');
+        return false;
+    }
+}
+
 function mail_ready(): bool {
     $test = getenv('APP_ENV') === 'test';
     $transport = getenv('MAIL_TRANSPORT') ?: 'disabled';
@@ -66,6 +176,10 @@ function mail_ready(): bool {
         && (bool)filter_var(getenv('MAIL_TO') ?: 'partner@jejubellabell.com',FILTER_VALIDATE_EMAIL)
         && ($test || (extension_loaded('openssl') && in_array(getenv('SMTP_ENCRYPTION')?:'tls',['tls','ssl'],true)))
         && is_file(APP_ROOT . '/vendor/autoload.php');
+}
+// The form is enabled when a token can be signed and at least one delivery channel exists.
+function contact_ready(): bool {
+    return contact_secret() !== '' && (mail_ready() || db_ready());
 }
 function send_contact_email(array $input, string $locale): bool {
     if (!mail_ready()) return false;

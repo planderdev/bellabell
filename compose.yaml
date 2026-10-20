@@ -1,0 +1,25 @@
+# Local production-like run: docker compose up --build  ->  http://127.0.0.1:8080/ko/
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      APP_URL: ${APP_URL:-http://127.0.0.1:8080}
+      APP_SECRET: ${APP_SECRET:-}
+      TRUST_PROXY_HTTPS: "0"
+      MAIL_TRANSPORT: ${MAIL_TRANSPORT:-disabled}
+      MAIL_TO: ${MAIL_TO:-partner@jejubellabell.com}
+      MAIL_FROM: ${MAIL_FROM:-}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-BELLABELL FARM}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_ENCRYPTION: ${SMTP_ENCRYPTION:-tls}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      DATABASE_URL: ${DATABASE_URL:-}
+    volumes:
+      - rate:/var/lib/bellabell
+volumes:
+  rate:

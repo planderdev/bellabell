@@ -15,27 +15,39 @@
 
 ## 로컬 실행
 
-PHP 8.2 이상이 필요합니다. 이 작업 환경에서는 PHP 8.5.5로 검증했습니다. PHP의 OpenSSL 확장을 활성화하세요.
+PHP 8.2 이상, Node 22 이상, Composer 2가 필요합니다. macOS/Linux:
 
-```powershell
+```bash
 npm ci
 composer install --no-dev --optimize-autoloader
 php -S 127.0.0.1:8080 router.php
 ```
 
-현재 Windows 환경에서 OpenSSL이 기본 비활성화되어 있으면:
+Windows PowerShell에서 OpenSSL이 기본 비활성화되어 있으면:
 
 ```powershell
 C:\php\php.exe -d extension=openssl -d extension=mbstring -S 127.0.0.1:8080 router.php
 ```
 
-Composer 명령이 없고 이번 작업에서 받은 공식 PHAR를 사용하는 경우:
+브라우저에서 <http://127.0.0.1:8080/ko/>를 엽니다. `/en/`, `/zh-CN/`도 제공합니다. FAQ를 포함한 언어별 10개 페이지, 총 30개 페이지가 있습니다. 정적 브라우저 라이브러리는 `assets/vendor/`에 포함되어 있어 기본 화면 실행에 Node 빌드 서버는 필요하지 않습니다. `/healthz`는 상태 점검용 JSON을 반환합니다.
 
-```powershell
-C:\php\php.exe -d extension=openssl -d extension=mbstring tools/composer.phar install --no-dev --optimize-autoloader
+Docker로 운영 환경과 같은 Apache+PHP 구성을 띄우려면:
+
+```bash
+docker compose up --build
 ```
 
-브라우저에서 <http://127.0.0.1:8080/ko/>를 엽니다. `/en/`, `/zh-CN/`도 제공합니다. FAQ를 포함한 언어별 10개 페이지, 총 30개 페이지가 있습니다. 정적 브라우저 라이브러리는 `assets/vendor/`에 포함되어 있어 기본 화면 실행에 Node 빌드 서버는 필요하지 않습니다.
+## 배포
+
+세 가지 경로를 지원하며 모두 같은 `router.php` 허용 목록을 사용합니다. 자세한 내용은 [운영 배포 안내](docs/deployment.md)를 참고하세요.
+
+| 경로 | 파일 | 비고 |
+| --- | --- | --- |
+| Vercel (기본) | `vercel.json`, `api/index.php`, `.vercelignore` | `vercel-php` 런타임, 서울(icn1) 리전. 세션 없이 동작하도록 설계됨 |
+| Docker (VPS, Fly.io, Railway 등) | `Dockerfile`, `compose.yaml` | Apache + PHP 8.4, `/healthz` 헬스체크 포함 |
+| Apache / Nginx + PHP-FPM | `.htaccess`, `docs/deployment.md`의 Nginx 예시 | 전통적인 PHP 호스팅 |
+
+GitHub Actions(`.github/workflows/ci.yml`)가 `main` 브랜치와 PR마다 PHP 8.2/8.4 테스트, HTTP·SMTP 통합 검사, Docker 빌드를 실행합니다.
 
 ## 구성
 
@@ -56,26 +68,28 @@ C:\php\php.exe -d extension=openssl -d extension=mbstring tools/composer.phar in
 
 현재 디자인은 제공된 SVG 로고, 화이트 배경, BASE UI 토큰과 프라이머리 `#00AF84`를 사용합니다. 다크모드 및 모션 토글 버튼은 제거했습니다. 운영체제의 모션 최소화 설정은 자동으로 존중합니다.
 
-## 문의 메일 설정
+## 문의 폼 설정
 
-`.env.example`을 `.env`로 복사하고 실제 도메인, 발신 주소 및 SMTP 환경을 설정합니다. `.env`는 Git에 포함되지 않습니다.
+`.env.example`을 참고해 호스팅 환경변수를 설정합니다. `.env`는 Git에 포함되지 않습니다.
 
-- `MAIL_TRANSPORT=smtp`, `SMTP_HOST`, `MAIL_FROM`이 필요합니다.
-- 수신 주소 기본값: `partner@jejubellabell.com`.
-- `SMTP_ENCRYPTION=tls`, 포트 587 또는 서비스에 맞는 SSL/465를 사용합니다.
-- SMTP 계정은 발신 도메인에서 발송 권한을 가진 계정이어야 합니다.
-- 설정이 없을 때는 전송 버튼을 비활성화하고 공식 이메일로 안내합니다. 성공한 것처럼 처리하지 않습니다.
-- IP 해시를 사용하는 요청 제한 파일은 웹 루트 밖에 둡니다. 다중 인스턴스 운영 시 공유 저장소 또는 프록시 수준 제한을 별도로 적용해야 합니다.
+- `APP_SECRET`: 운영에서 필수. 문의 폼 토큰 서명과 IP 해시에 사용합니다 (`openssl rand -hex 32`).
+- 문의 폼은 **메일(SMTP)** 또는 **데이터베이스(`DATABASE_URL`)** 중 하나 이상이 설정되면 활성화됩니다. 둘 다 없으면 전송 버튼을 비활성화하고 공식 이메일로 안내합니다.
+- 메일: `MAIL_TRANSPORT=smtp`, `SMTP_HOST`, `MAIL_FROM` 필요. 수신 기본값 `partner@jejubellabell.com`. `SMTP_ENCRYPTION=tls`(587) 또는 `ssl`(465).
+- 데이터베이스: PostgreSQL(Supabase 등)에 `db/schema.sql`을 적용한 뒤 `DATABASE_URL`을 설정합니다. 문의 내용이 `contact_enquiries`에 저장되고, 요청 제한과 토큰 1회성 검사가 인스턴스 간에 공유됩니다.
+- 메일과 DB를 모두 설정하면 메일 전송 여부(`mail_sent`)와 함께 저장되므로 메일 장애 시에도 문의가 유실되지 않습니다.
+- CSRF 토큰은 서버 세션 없이 HMAC 서명으로 검증합니다(발급 후 3초~2시간 유효). DB가 없을 때는 파일 기반 요청 제한(`CONTACT_RATE_DIR`, 웹 루트 밖)을 사용하며, 다중 인스턴스에서는 DB 설정을 권장합니다.
 
-로컬 테스트에서는 외부로 전송하지 않고 `127.0.0.1` SMTP 테스트 서버에서 합성 메일 1건을 받았습니다. 실제 SMTP 인증, 외부 수신함 도달 및 SPF/DKIM/DMARC는 운영 환경에서 확인해야 합니다.
+로컬 테스트에서는 외부로 전송하지 않고 `127.0.0.1` SMTP 테스트 서버에서 합성 메일 1건을 받습니다. 실제 SMTP 인증, 외부 수신함 도달 및 SPF/DKIM/DMARC는 운영 환경에서 확인해야 합니다.
 
 ## 검사
 
-```powershell
+```bash
 php tests/run.php
 npm run check
-python tests/http_check.py
-python tests/smtp_integration.py
+node tests/design-system.mjs
+node tests/motion.mjs
+python3 tests/http_check.py
+python3 tests/smtp_integration.py
 ```
 
 HTTP 검사는 8080 로컬 서버가 실행 중이어야 합니다. SMTP 검사는 별도 로컬 PHP/SMTP 프로세스를 시작하고 종료합니다.

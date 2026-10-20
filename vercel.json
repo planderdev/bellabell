@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "regions": ["icn1"],
+  "functions": {
+    "api/index.php": {
+      "runtime": "vercel-php@0.8.0",
+      "memory": 1024,
+      "maxDuration": 30,
+      "excludeFiles": "{assets/**,docs/**,tests/**,tools/**,design-system/**,node_modules/**,db/**,.github/**,*.md,compose.yaml,Dockerfile}"
+    }
+  },
+  "routes": [
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/(.*)", "dest": "/api/index.php" }
+  ]
+}

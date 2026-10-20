@@ -1,6 +1,6 @@
 Options -Indexes
 RewriteEngine On
-RewriteRule ^(?:includes|sections|data|design-system|docs|tests|tools|vendor|node_modules|\.git|\.runtime)(?:/|$) - [F,L]
+RewriteRule ^(?:includes|sections|data|design-system|docs|tests|tools|vendor|node_modules|db|api|\.git|\.runtime)(?:/|$) - [F,L]
 RewriteRule (^|/)\. - [F,L]
 RewriteCond %{REQUEST_URI} !^/assets/
 RewriteRule ^ router.php [L,QSA]
