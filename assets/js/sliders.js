@@ -1,12 +1,14 @@
 export function initSliders(reduced) {
   const section = document.querySelector('.brands-section');
   if (!section || !window.Swiper || reduced) return () => {};
-  const media = matchMedia('(max-width:1023px)');
+  // Pinned portfolios own normal mobile viewports; swipe is the short-screen fallback.
+  const media = matchMedia(window.gsap && window.ScrollTrigger
+    ? '(max-width:1023px) and (orientation:landscape) and (max-height:599px)' : '(max-width:1023px)');
   let swiper = null;
   const destroySlider = () => {
     if (swiper) swiper.destroy(true,true);
     swiper=null;section.classList.remove('has-slider');
-    // Desktop GSAP uses aria-disabled; discard Swiper's native disabled state.
+    // Pinned GSAP controls use aria-disabled; discard Swiper's native disabled state.
     section.querySelectorAll('.brand-navigation button').forEach(button=>{button.disabled=false;});
   };
   const update = () => {

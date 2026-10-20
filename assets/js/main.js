@@ -8,7 +8,11 @@ import {scrollTopFor} from './scroll-target.js';
 
 document.documentElement.classList.add('js');
 window.lucide?.createIcons({attrs:{'stroke-width':2}});
-if (window.gsap && window.ScrollTrigger) window.gsap.registerPlugin(window.ScrollTrigger);
+if (window.gsap && window.ScrollTrigger) {
+  window.gsap.registerPlugin(window.ScrollTrigger);
+  // Stable svh stages must not jump when mobile browser chrome expands/collapses.
+  window.ScrollTrigger.config({ignoreMobileResize:true});
+}
 const motionPreference = matchMedia('(prefers-reduced-motion:reduce)');
 const isReduced = () => motionPreference.matches;
 let smooth=null;

@@ -5,7 +5,7 @@
 [디자인 시스템](docs/design-system.md) · [QA 보고서](docs/qa-report.md)
 
 토큰/공통 UI 재생성: `npm run design-system`. 검사: `node tests/design-system.mjs`.
-기존 5개 GSAP 시퀀스의 동작 구조는 유지되며 회귀 검사는 `node tests/motion.mjs`입니다. 이전 모션 구현 기록은 [3차 보고서](docs/motion-upgrade.md)에 보관합니다.
+핵심 5개 GSAP 시퀀스는 모바일에서도 유지됩니다. 세로형 모바일과 높이 600px 이상인 태블릿에서는 세로 구성·짧은 스크롤 거리·네이티브 터치 스크롤을 사용합니다. 높이 600px 미만인 가로형 모바일과 모션 최소화 설정은 읽기 가능한 흐름으로 전환합니다. 현재 구성은 [모션 지도](docs/motion-map.md), 회귀 검사는 `node tests/motion.mjs`, 이전 구현 기록은 [3차 보고서](docs/motion-upgrade.md)에 있습니다.
 
 ---
 

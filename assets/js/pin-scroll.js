@@ -22,14 +22,15 @@ export function initPins(reduced, getScroll) {
   const {gsap,ScrollTrigger} = window;
   const mediaRadius=getComputedStyle(document.documentElement).getPropertyValue('--radius-lg').trim();
   const mm = gsap.matchMedia();
-  mm.add('(min-width:1024px)', () => {
+  mm.add({desktop:'(min-width:1024px)',compact:'(max-width:1023px) and (orientation:portrait), (max-width:1023px) and (min-height:600px)'}, context => {
+    const compact=context.conditions.compact;
     const cleanups = [], refreshStates = [];
     const pin = (section,id,distance,scrub=.55) => {
       section.classList.add('is-pinned');
       cleanups.push(()=>section.classList.remove('is-pinned','is-motion-active'));
       return gsap.timeline({defaults:{ease:'none'},scrollTrigger:{
         id,trigger:section,start:'top top',end:()=>`+=${Math.round(distance())}`,
-        pin:true,pinSpacing:true,scrub,anticipatePin:1,invalidateOnRefresh:true,
+        pin:true,pinSpacing:true,scrub:compact?.35:scrub,anticipatePin:1,invalidateOnRefresh:true,
         onToggle:self=>section.classList.toggle('is-motion-active',self.isActive)
       }});
     };
@@ -45,7 +46,18 @@ export function initPins(reduced, getScroll) {
 
     // 01 — the opening landscape becomes the image frame of the introduction.
     const journey=document.querySelector('.hero-journey');
-    if(journey){
+    if(journey && compact){
+      // Let the introduction keep its full reading height on a narrow screen.
+      const hero=journey.querySelector('.hero');
+      const tl=pin(hero,'hero-journey',()=>hero.offsetHeight*.9);
+      tl.to(hero.querySelector('.hero-poster'),{scale:1.16,yPercent:4,duration:1.5},0)
+        .to(hero.querySelector('.hero-brand-line:nth-child(1)'),{xPercent:-18,y:-45,duration:1.5},0)
+        .to(hero.querySelector('.hero-brand-line:nth-child(2)'),{xPercent:20,y:-20,duration:1.5},0)
+        .to(hero.querySelector('.hero-brand'),{autoAlpha:0,duration:.6},.6)
+        .to(hero.querySelector('h1'),{y:-35,duration:1.5},0)
+        .to(hero.querySelector('.hero-media'),{clipPath:`inset(9% 4% 4% 4% round ${mediaRadius})`,duration:1.1,ease:'power2.inOut'},.4)
+        .to(hero.querySelector('.hero-scroll-progress>span'),{scaleX:1,duration:1.5},0);
+    }else if(journey){
       const intro=journey.querySelector('.introduction');
       const introParts=[...intro.querySelectorAll('.section-label,h2,.intro-lines p,.body-copy,.text-link')];
       const heroParts=[journey.querySelector('.hero-content'),journey.querySelector('.hero-bottom')];
@@ -82,8 +94,10 @@ export function initPins(reduced, getScroll) {
     const philosophy=document.querySelector('.philosophy-section');
     if(philosophy){
       const scenes=[...philosophy.querySelectorAll('.philosophy-scene')];
-      const tl=pin(philosophy,'philosophy',()=>philosophy.offsetHeight*3.2,.6);
-      const aperture=['inset(0% 0% 0% 0%)','inset(23% 7% 23% 69%)','inset(65% 56% 8% 7%)'];
+      const tl=pin(philosophy,'philosophy',()=>philosophy.offsetHeight*(compact?2.1:3.2),.6);
+      const aperture=compact
+        ?['inset(0% 0% 0% 0%)','inset(28% 6% 32% 48%)','inset(55% 38% 9% 6%)']
+        :['inset(0% 0% 0% 0%)','inset(23% 7% 23% 69%)','inset(65% 56% 8% 7%)'];
       scenes.forEach((scene,i)=>{
         const image=scene.querySelector('.philosophy-image');
         const word=scene.querySelector('.philosophy-word');
@@ -114,7 +128,7 @@ export function initPins(reduced, getScroll) {
       const track=ingredients.querySelector('.ingredients-track');
       const cards=[...track.children];
       const distance=()=>Math.max(0,track.scrollWidth-ingredients.clientWidth);
-      const tl=pin(ingredients,'ingredients',()=>Math.max(ingredients.offsetHeight*1.4,distance()*1.05),.6);
+      const tl=pin(ingredients,'ingredients',()=>Math.max(ingredients.offsetHeight*(compact?1.25:1.4),distance()*(compact?1.2:1.05)),.6);
       tl.to(track,{x:()=>-distance(),duration:3},0)
         .to(ingredients.querySelector('.gallery-track span'),{scaleX:1,duration:3},0);
       cards.forEach((card,i)=>{
@@ -124,7 +138,7 @@ export function initPins(reduced, getScroll) {
       });
       const focus=event=>{
         const card=event.target.closest('.ingredient-card');if(!card)return;
-        const progress=Math.min(1,Math.max(0,(card.offsetLeft-parseFloat(getComputedStyle(track).paddingLeft))/distance()));
+        const progress=Math.min(1,Math.max(0,(card.offsetLeft-parseFloat(getComputedStyle(track).paddingLeft))/Math.max(1,distance())));
         seek(tl,progress,true);
       };
       track.addEventListener('focusin',focus);
@@ -135,7 +149,7 @@ export function initPins(reduced, getScroll) {
     const technology=document.querySelector('.technology-section');
     if(technology){
       const scenes=[...technology.querySelectorAll('.research-scene')];
-      const tl=pin(technology,'technology',()=>technology.offsetHeight*2.6,.55);
+      const tl=pin(technology,'technology',()=>technology.offsetHeight*(compact?1.8:2.6),.55);
       scenes.forEach((scene,i)=>{
         const media=scene.querySelector('.research-image'),copy=scene.querySelector('.research-copy');
         gsap.set(media,{clipPath:i?'inset(100% 0% 0% 0%)':'inset(0% 0% 0% 0%)'});
@@ -163,13 +177,13 @@ export function initPins(reduced, getScroll) {
     if(brands){
       const panels=[...brands.querySelectorAll('.brand-panel')];
       const [first,second]=panels;
-      const tl=pin(brands,'brands',()=>brands.offsetHeight*1.8,.6);
+      const tl=pin(brands,'brands',()=>brands.offsetHeight*(compact?1.25:1.8),.6);
       gsap.set(second,{clipPath:'inset(100% 0% 0% 0%)'});
       tl.addLabel('from-halla',0)
         .to(first.querySelector('.brand-art img'),{scale:1.1,duration:1.8},0)
         .to(first.querySelector('.brand-display'),{xPercent:-12,y:-60,autoAlpha:0,duration:1.15},.4)
         .to(first.querySelector('.brand-copy'),{y:-70,autoAlpha:0,duration:.65},.55)
-        .to(second,{clipPath:`inset(45% 42% 12% 7% round ${mediaRadius})`,duration:.45,ease:'power2.out'},.5)
+        .to(second,{clipPath:compact?`inset(32% 8% 38% 8% round ${mediaRadius})`:`inset(45% 42% 12% 7% round ${mediaRadius})`,duration:.45,ease:'power2.out'},.5)
         .to(second,{clipPath:'inset(0% 0% 0% 0% round 0px)',duration:1.15,ease:'power2.inOut'},.95)
         .fromTo(second.querySelector('.brand-art'),{scale:1.13,y:60},{scale:1,y:0,duration:1.4},.65)
         .fromTo(second.querySelector('.brand-display'),{xPercent:32,y:45},{xPercent:0,y:0,duration:1.25,ease:'power2.out'},.95)

@@ -1,18 +1,22 @@
 # Motion map
 
-## Current: revision 3
+## Current: mobile cinematic update
 
-Current configuration is in [메인 모션 고도화 보고서](motion-upgrade.md).
+The same five scene timelines now run on desktop, portrait mobile and compact viewports at least 600px tall. Compact layouts use native scrolling, stable `100svh` stages and a shorter `.35` scrub. Desktop distances and choreography remain unchanged.
 
-| Pin ID | start | end | scrub | pin / pinSpacing |
+| Pin ID | Desktop end | Compact end | start | pin / pinSpacing |
 | --- | --- | --- | --- | --- |
-| hero-journey | top top | measured section height × 1.65 | .55 | true / true |
-| philosophy | top top | measured section height × 3.2 | .60 | true / true |
-| ingredients | top top | max(height × 1.4, horizontal travel × 1.05) | .60 | true / true |
-| technology | top top | measured section height × 2.6 | .55 | true / true |
-| brands | top top | measured section height × 1.8 | .60 | true / true |
+| hero-journey | H × 1.65, combined hero/intro | H × .9, hero only | top top | true / true |
+| philosophy | H × 3.2 | H × 2.1 | top top | true / true |
+| ingredients | max(H × 1.4, travel × 1.05) | max(H × 1.25, travel × 1.2) | top top | true / true |
+| technology | H × 2.6 | H × 1.8 | top top | true / true |
+| brands | H × 1.8 | H × 1.25 | top top | true / true |
 
-Five sibling timelines; zero nested pins. Each controls multiple visual elements, chapter state and progress where applicable. Desktop only (≥1024px); mobile and reduced motion use source flow. Lenis shares one GSAP ticker; refresh synchronizes Lenis size and chapter semantics.
+H is the measured stage height; travel is the gallery's actual overflow width. Pins never nest. Mobile hero image scale/masking and opposite brand-line travel lead into an unpinned, readable introduction with synchronized text/photo parallax. Philosophy keeps all three masked scenes. The ingredient gallery translates horizontally from vertical touch scrolling; research and brands stack their media and copy vertically. Brand buttons seek the same timeline on both layouts.
+
+Mobile intro, sustainability and the final partnership section also retain scroll-linked motion. Native touch scrolling is preserved: no touch interception, forced snapping or mobile Lenis. `ignoreMobileResize` avoids refresh jumps from browser chrome; width/orientation changes rebuild scenes via GSAP matchMedia. Portrait eligibility does not depend on a height threshold, so browser chrome cannot toggle pins off. Only compact landscape viewports below 600px tall return to readable flow and a brand Swiper. Reduced motion removes pins and restores every panel regardless of width.
+
+Lenis remains desktop-only on a single GSAP ticker. Fonts/load refresh layout and chapter semantics. The [3차 보고서](motion-upgrade.md) records the earlier desktop implementation.
 
 The earlier fade/card-slide/video settings below are retained only as the **pre-upgrade comparison**. They are superseded by revision 3.
 

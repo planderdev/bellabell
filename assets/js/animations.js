@@ -28,20 +28,28 @@ export function initAnimations(reduced) {
       }
     });
     const mm=gsap.matchMedia();
-    mm.add('(min-width:1024px)',()=>{
+    mm.add({desktop:'(min-width:1024px)',compact:'(max-width:1023px)'},media=>{
+      const compact=media.conditions.compact;
       // Level 2 ties the landscape opening and its statement to the same playhead.
       const section=document.querySelector('.sustainability-section');
       if(section){
         gsap.timeline({defaults:{ease:'none'},scrollTrigger:{trigger:section,start:'top 80%',end:'bottom 55%',scrub:.6}})
-          .fromTo('.sustainability-image',{clipPath:`inset(12% 18% 12% 18% round ${mediaRadius})`},{clipPath:'inset(0% 0% 0% 0% round 0px)',duration:1},0)
-          .fromTo('.sustainability-image>img',{scale:1.18,yPercent:5},{scale:1,yPercent:0,duration:1.3},0)
-          .from('.sustainability-copy',{y:65,duration:.8},.35)
+          .fromTo('.sustainability-image',{clipPath:compact?`inset(6% 5% 6% 5% round ${mediaRadius})`:`inset(12% 18% 12% 18% round ${mediaRadius})`},{clipPath:'inset(0% 0% 0% 0% round 0px)',duration:1},0)
+          .fromTo('.sustainability-image>img',{scale:compact?1.1:1.18,yPercent:compact?2:5},{scale:1,yPercent:0,duration:1.3},0)
+          .from('.sustainability-copy',{y:compact?28:65,duration:.8},.35)
           .to('.sustainability-intro',{y:-30,duration:1},0);
       }
       const global=document.querySelector('.global-section');
       if(global)gsap.timeline({defaults:{ease:'none'},scrollTrigger:{trigger:global,start:'top bottom',end:'bottom top',scrub:.7}})
-        .fromTo('.global-background',{yPercent:-8,scale:1.16},{yPercent:8,scale:1.06,duration:1},0)
-        .fromTo('.global-content',{y:45},{y:-35,duration:1},0);
+        .fromTo('.global-background',{yPercent:compact?-3:-8,scale:compact?1.1:1.16},{yPercent:compact?3:8,scale:1.06,duration:1},0)
+        .fromTo('.global-content',{y:compact?20:45},{y:compact?-15:-35,duration:1},0);
+      const intro=document.querySelector('.introduction');
+      if(compact && intro){
+        gsap.timeline({defaults:{ease:'none'},scrollTrigger:{trigger:intro,start:'top 90%',end:'bottom 60%',scrub:.4}})
+          .fromTo(intro.querySelector('h2'),{y:32},{y:0,duration:1},0)
+          .fromTo(intro.querySelectorAll('.intro-lines p'),{opacity:.25,y:18},{opacity:1,y:0,stagger:.25,duration:.7},.15)
+          .fromTo(intro.querySelector('.intro-right'),{y:40,rotation:5,scale:1.08},{y:-16,rotation:0,scale:1,duration:1.5},0);
+      }
     });
     const events=[...document.querySelectorAll('.history-event')];
     events.forEach(event=>{
